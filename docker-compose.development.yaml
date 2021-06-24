@@ -1,0 +1,29 @@
+# Создаем еще один docker-compose файл с другим окружением и режимом работы
+# Это пригодится для поднятия Development версии проекта
+version: "3" # Указываем версию docker-compose
+
+services:
+    frontend: # Сервис Frontend
+        build:
+            context: ./frontend/ # Указываем откуда собрать образ в контекстном виде
+            dockerfile: Dockerfile.dev # Указываем что хотим использовать Dockerfile.dev
+        command: npm run start # Запускаем приложение с окружением dev
+        stdin_open: true
+        tty: true
+        volumes: # Описываем секцию хранилищ
+            - ./frontend/src:/usr/src/app/src # Пробросим путь "./frontend/src" - ИЗ ХОСТА в "/usr/src/app/src"- в контенер
+
+    api: # Сервис API
+        command: npm run dev # Запускаем приложение с окружением dev
+        volumes: # Описываем секцию хранилищ
+            - ./api/src:/usr/src/app/src # Пробрасываем путь "./api/src" - ИЗ ХОСТА в "/usr/src/app/src" - контейнер, т.е. просто симлинк
+
+    auth: # Сервис AUTH
+        command: npm run dev # Запускаем приложение с окружением dev
+        volumes: # Описываем секцию хранилищ
+            - ./auth/src:/usr/src/app/src # Пробрасываем путь "./auth/src" - ИЗ ХОСТА в "/usr/src/app/src" - контейнер, т.е. просто симлинк
+
+    nginx: # Сервис nginx
+        volumes: # Устанавливаем хранилище для файлов базы данных
+        - ./nginx/nginx.conf.dev:/etc/nginx/conf.d/nginx.conf # Пробрасываем наш кастомный nginx.conf внутрь контейнера
+
